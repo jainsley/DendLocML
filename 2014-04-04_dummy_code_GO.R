@@ -1,13 +1,10 @@
-#Test of dummy coding gene ontology(GO) categories using cast function from reshape2 package.
+#Dummy coding gene ontology (GO) categories. To be run on Tufts cluster.
 
 library(reshape2)
-setwd("~/Copy/R_Code/Projects/DendLocML")
+setwd("/cluster/tufts/jainsl01/DendLocML/")
 
-#Create test data frame, add column names
-gene_GO <- data.frame("Gene" = c("0610005C13Rik","0610005C13Rik","0610005C13Rik","0610006L08Rik","0610006L08Rik",
-                              "0610006L08Rik","0610007P14Rik","0610007P14Rik","0610007P14Rik","0610007P14Rik"),
-                   "GO" = c("GO:0003674","GO:0005575","GO:0008150","GO:0003674","GO:0005575",
-                              "GO:0008150","GO:0005783","GO:0006629","GO:0006694","GO:0008202"))
+#Read in genome wide GO data, add column names.
+gene_GO <- read.table("/cluster/tufts/jainsl01/DendLocML/gene_GO.mgi", header=F)
 colnames(gene_GO) <- c("Gene", "GO")
 
 #Convert to wide format with dcast.
