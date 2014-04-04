@@ -4,7 +4,7 @@ library(reshape2)
 setwd("/cluster/tufts/jainsl01/DendLocML/")
 
 #Read in genome wide GO data, add column names.
-gene_GO <- read.table("/cluster/tufts/jainsl01/DendLocML/gene_GO.mgi", header=F)
+gene_GO <- read.table("./data/gene_GO.mgi", header=F)
 colnames(gene_GO) <- c("Gene", "GO")
 
 #Convert to wide format with dcast.
@@ -25,4 +25,4 @@ gene_GO_dc <- cbind(row.names(gene_GO_cast.2), gene_GO_cast.2)
 colnames(gene_GO_dc)[1] <- "Gene"
 
 #Write file
-write.table(gene_GO_dc, file = "gene_GO_dummy_coded.txt", quote=F, row.names=F)
+write.table(gene_GO_dc, file = "./data/gene_GO_dummy_coded.txt", quote=F, row.names=F)
