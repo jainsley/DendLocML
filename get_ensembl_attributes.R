@@ -1,5 +1,6 @@
 #setwd("C:/Users/jainsl01/Copy/R_Code/Projects/DendLocML")
-setwd("~/Copy/R_Code/Projects/DendLocML")
+#setwd("~/Copy/R_Code/Projects/DendLocML")
+setwd("/cluster/tufts/jainsl01/DendLocML")
 
 library("biomaRt")
 
@@ -8,7 +9,7 @@ ensembl <- useMart("ensembl",dataset="mmusculus_gene_ensembl")
 ensembl_genes <- getBM(attributes = "ensembl_gene_id", mart = ensembl)
 
 #Read in attributes to use
-attributes <- read.csv('output_rows.csv', stringsAsFactors = FALSE)
+attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
 
 #Get simple attributes
 simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
@@ -26,4 +27,4 @@ get_mart_data_loop <- function(char.ensembl, char.attribs) {
 }
 
 simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
-write.csv(simple_output, "simple_output.csv")
+write.csv(simple_output, "./data/simple_output.csv")
