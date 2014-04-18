@@ -12,7 +12,6 @@ attributes <- read.csv('output_rows.csv', stringsAsFactors = FALSE)
 
 #Get simple attributes
 simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
-genes <- c('ENSMUSG00000024617','ENSMUSG00000033981')
 
 #Function to get biomart data from character vector input
 get_mart_data_loop <- function(char.ensembl, char.attribs) {
@@ -26,5 +25,5 @@ get_mart_data_loop <- function(char.ensembl, char.attribs) {
   return(output)
 }
 
-simple_output <- get_mart_data_loop(genes, simple.attr)
+simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
 write.csv(simple_output, "simple_output.csv")
