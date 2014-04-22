@@ -21,10 +21,11 @@ get_mart_data_loop <- function(char.ensembl, char.attribs) {
   for (i in char.attribs) {
     attribs <- c('ensembl_gene_id', i)
     temp_output <- getBM(attributes=attribs, filters = 'ensembl_gene_id', values = char.ensembl, mart = ensembl)
-    output <- join(output, temp_output, by='ensembl_gene_id')
+    #output <- join(output, temp_output, by='ensembl_gene_id')
+    write.csv(temp_output, paste0("./data/",i,".csv"))
   }  
-  return(output)
+  #return(output)
 }
 
-simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
-write.csv(simple_output, "./data/simple_output.csv")
+#simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
+#write.csv(simple_output, "./data/simple_output.csv")
