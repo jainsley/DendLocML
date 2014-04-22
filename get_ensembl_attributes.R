@@ -14,6 +14,11 @@ attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
 #Get simple attributes
 simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
 
+filenames <- list.files("./data", pattern="*.csv", full.names=FALSE)
+collected_data <- gsub(".csv", "", filenames)
+
+uncollected_data <- subset(simple.attr, !(simple.attr %in% collected_data))
+
 #Function to get biomart data from character vector input
 get_mart_data_loop <- function(char.ensembl, char.attribs) {
   library(plyr)
@@ -28,5 +33,7 @@ get_mart_data_loop <- function(char.ensembl, char.attribs) {
   #return(output)
 }
 
-simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
+print(uncollected_data)
+
+#simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
 #write.csv(simple_output, "./data/simple_output.csv")
