@@ -1,8 +1,8 @@
 #setwd("C:/Users/jainsl01/Copy/R_Code/Projects/DendLocML")
-#setwd("~/Copy/R_Code/Projects/DendLocML")
-setwd("/cluster/tufts/jainsl01/DendLocML")
+setwd("~/Copy/R_Code/Projects/DendLocML")
+#setwd("/cluster/tufts/jainsl01/DendLocML")
 
-#library("biomaRt")
+library("biomaRt")
 library(dplyr)
 
 rm(list = ls())
@@ -13,13 +13,27 @@ rm(list = ls())
 #write.csv(ensembl_genes, "./data/ensembl_genes.txt", quote=FALSE, row.names=FALSE, col.names=FALSE)
 
 #Read in ensembl gene names
-ensembl_genes <- read.table("./data/ensembl_genes.txt", col.names=TRUE)
+ensembl_genes <- read.table("./data/ensembl_genes.txt", header=TRUE)
 
 #Read in attributes to use
-#attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
+attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
 
 #Get simple attributes
-#simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
+simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
+
+#Function to get biomart data from character vector input
+get_mart_data_loop <- function(char.ensembl, char.attribs) {
+  for (i in char.attribs) {
+    attribs <- c('ensembl_gene_id', i)
+    temp_output <- getBM(attributes=attribs, filters = 'ensembl_gene_id', values = char.ensembl, mart = ensembl)
+    write.csv(temp_output, paste0("./output_data/",i,".csv"), quote=FALSE)
+    Sys.sleep(1)
+  }  
+}
+
+#get_mart_data_loop(ensembl_genes, simple.attr)
+
+
 
 #Read in csv filenames
 filenames <- list.files("./data", pattern="*.csv", full.names=TRUE)
@@ -33,17 +47,6 @@ filenames <- list.files("./data", pattern="*.csv", full.names=TRUE)
 
 #uncollected_data <- subset(simple.attr, !(simple.attr %in% collected_data))
 
-#Function to get biomart data from character vector input
-#get_mart_data_loop <- function(char.ensembl, char.attribs) {
-#  for (i in char.attribs) {
-#    attribs <- c('ensembl_gene_id', i)
-#    temp_output <- getBM(attributes=attribs, filters = 'ensembl_gene_id', values = char.ensembl, mart = ensembl)
-#    write.csv(temp_output, paste0("./output_data/",i,".csv"), quote=FALSE)
-#    Sys.sleep(1)
-#  }  
-#}
-
-#simple_output <- get_mart_data_loop(ensembl_genes, uncollected_data)
 
 #Function to read in biomart data and merge them based on gene name
 #merge_mart_data <- function(char.ensembl, char.attribs) {
