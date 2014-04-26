@@ -2,38 +2,114 @@
 #setwd("~/Copy/R_Code/Projects/DendLocML")
 setwd("/cluster/tufts/jainsl01/DendLocML")
 
-library("biomaRt")
+#library("biomaRt")
+library(dplyr)
+
+rm(list = ls())
 
 #Set up mart
-ensembl <- useMart("ensembl",dataset="mmusculus_gene_ensembl")
-ensembl_genes <- getBM(attributes = "ensembl_gene_id", mart = ensembl)
+#ensembl <- useMart("ensembl",dataset="mmusculus_gene_ensembl")
+#ensembl_genes <- getBM(attributes = "ensembl_gene_id", mart = ensembl)
+#write.csv(ensembl_genes, "./data/ensembl_genes.txt", quote=FALSE, row.names=FALSE, col.names=FALSE)
+
+#Read in ensembl gene names
+ensembl_genes <- read.table("./data/ensembl_genes.txt", col.names=TRUE)
 
 #Read in attributes to use
-attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
+#attributes <- read.csv('./data/output_rows.csv', stringsAsFactors = FALSE)
 
 #Get simple attributes
-simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
+#simple.attr <- subset(attributes$Attribute, attributes$RowNum == 2)
 
-filenames <- list.files("./data", pattern="*.csv", full.names=FALSE)
-collected_data <- gsub(".csv", "", filenames)
+#Read in csv filenames
+filenames <- list.files("./data", pattern="*.csv", full.names=TRUE)
 
-uncollected_data <- subset(simple.attr, !(simple.attr %in% collected_data))
+#Merge dataframes in a list
+#ldf <- lapply(filenames, read.csv)
+#bigdf <- merge_all(ldf)
+#write.csv(bigdf, "./output_data/bigdf.1to20.csv")
+
+#collected_data <- gsub(".csv", "", filenames)
+
+#uncollected_data <- subset(simple.attr, !(simple.attr %in% collected_data))
 
 #Function to get biomart data from character vector input
-get_mart_data_loop <- function(char.ensembl, char.attribs) {
-  library(plyr)
-  output <- data.frame(ensembl_gene_id = char.ensembl)
-  for (i in char.attribs) {
-    attribs <- c('ensembl_gene_id', i)
-    temp_output <- getBM(attributes=attribs, filters = 'ensembl_gene_id', values = char.ensembl, mart = ensembl)
-    #output <- join(output, temp_output, by='ensembl_gene_id')
-    write.csv(temp_output, paste0("./data/",i,".csv"), quote=FALSE)
-    Sys.sleep(1)
-  }  
-  #return(output)
+#get_mart_data_loop <- function(char.ensembl, char.attribs) {
+#  for (i in char.attribs) {
+#    attribs <- c('ensembl_gene_id', i)
+#    temp_output <- getBM(attributes=attribs, filters = 'ensembl_gene_id', values = char.ensembl, mart = ensembl)
+#    write.csv(temp_output, paste0("./output_data/",i,".csv"), quote=FALSE)
+#    Sys.sleep(1)
+#  }  
+#}
+
+#simple_output <- get_mart_data_loop(ensembl_genes, uncollected_data)
+
+#Function to read in biomart data and merge them based on gene name
+#merge_mart_data <- function(char.ensembl, char.attribs) {
+#  output <- data.frame(ensembl_gene_id = char.ensembl)
+#  for (i in char.attribs) {
+#    temp_output <- read.csv(paste0("./data/",i))
+#    output <- join(output, temp_output, by='ensembl_gene_id')
+#    output <- merge(output, temp_output, by='ensembl_gene_id')
+#  }
+#  return(output)
+#}
+
+#merged_data <- merge_mart_data(ensembl_genes[,1], filenames)
+
+#write.csv(merged_data, "./output_data/merged_data.csv")
+
+merge_mart_data <- function(input_files) {
+  ldf <- lapply(input_files, read.csv)
+  mdf <- ldf[[1]]
+  for (df in ldf) {
+    mdf <- left_join(mdf, df, by = 'ensembl_gene_id')
+  }
+  return(mdf)
 }
 
-print(uncollected_data)
+#merged_1to20 <- merge_mart_data(filenames[1:20])
+#write.csv(merged_1to20, "./output_data/mdf1to20.csv")
+#rm(merged_1to20)
 
-#simple_output <- get_mart_data_loop(ensembl_genes, simple.attr)
-#write.csv(simple_output, "./data/simple_output.csv")
+#merged_21to40 <- merge_mart_data(filenames[21:40])
+#write.csv(merged_21to40, "./output_data/mdf21to40.csv")
+#rm(merged_21to40)
+
+#merged_41to60 <- merge_mart_data(filenames[41:60])
+#write.csv(merged_41to60, "./output_data/mdf41to60.csv")
+#rm(merged_41to60)
+
+#merged_61to80 <- merge_mart_data(filenames[61:80])
+#write.csv(merged_61to80, "./output_data/mdf61to80.csv")
+#rm(merged_61to80)
+
+#merged_81to100 <- merge_mart_data(filenames[81:100])
+#write.csv(merged_81to100, "./output_data/mdf81to100.csv")
+#rm(merged_81to100)
+
+#merged_101to120 <- merge_mart_data(filenames[101:120])
+#write.csv(merged_101to120, "./output_data/mdf101to120.csv")
+#rm(merged_101to120)
+
+#merged_121to136 <- merge_mart_data(filenames[121:136])
+#write.csv(merged_121to136, "./output_data/mdf121to136.csv")
+#rm(merged_121to136)
+
+filenames <- list.files("./output_data", pattern="mdf*.csv", full.names=TRUE)
+
+#aggregate_mart_data <- function(input_files) {
+#  ldf <- lapply(input_files, function(i){read.csv(i, header=TRUE, stringsAsFactors=FALSE)})
+#  for (df in ldf) {
+#    adf <- aggregate(df, by = list(df$ensembl_gene_id), max)
+#  }
+#  return(adf)
+#}
+
+
+for (i in filenames) {
+  df <- read.csv(i, stringsAsFactors = FALSE)
+  agg <- aggregate(df, by=list(df$ensembl_gene_id), max)
+  write.csv(agg, gsub("mdf","adf",i))
+}
